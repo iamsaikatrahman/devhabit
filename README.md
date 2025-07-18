@@ -95,3 +95,93 @@ Accept: application/vnd.companyname.v1+json
 
 ---
 
+## 🛠️ API Change Management in REST API
+
+**API Change Management** refers to the practices and strategies used to handle modifications in your REST API **without breaking existing clients**. As APIs evolve over time, it's crucial to introduce changes in a controlled and backward-compatible way.
+
+---
+
+## 🔄 Types of API Changes
+
+### ✅ **Non-Breaking Changes (Safe to Release)**
+
+* Adding new fields to the response
+* Adding new optional query parameters
+* Adding new endpoints
+* Deprecating features (with a warning)
+
+### ❌ **Breaking Changes (Need Versioning or Coordination)**
+
+* Removing or renaming existing fields
+* Changing the data type of a field
+* Modifying response structure
+* Changing the endpoint path
+* Making optional fields required
+
+---
+
+## 📋 Best Practices for API Change Management
+
+### 1. **Use API Versioning**
+
+Always version your API to safely manage breaking changes. For example:
+
+```http
+GET /api/v1/users
+GET /api/v2/users
+```
+
+### 2. **Deprecate Gradually**
+
+* Mark old endpoints or fields as deprecated.
+* Provide a deprecation notice in the response headers or documentation.
+
+```http
+Warning: 299 - "Deprecated API. Please migrate to /api/v2/users"
+```
+
+### 3. **Communicate Clearly**
+
+* Use changelogs and release notes.
+* Notify clients (email, dashboards, etc.) before making major changes.
+
+### 4. **Follow Semantic Versioning**
+
+If applicable:
+
+* `v1.0.0` → Initial release
+* `v1.1.0` → Minor (non-breaking) additions
+* `v2.0.0` → Major (breaking) changes
+
+### 5. **Use Feature Flags**
+
+Control feature rollout and test changes without affecting all users.
+
+### 6. **Automated Testing & Monitoring**
+
+* Ensure new changes don’t break existing functionality.
+* Monitor API usage to identify which endpoints or fields are in use.
+
+---
+
+## 🚧 Example of Safe Change
+
+Adding a new `email` field:
+
+```json
+// Old response
+{
+  "id": 1,
+  "name": "John"
+}
+
+// New response
+{
+  "id": 1,
+  "name": "John",
+  "email": "john@example.com"  // Added non-breaking field
+}
+```
+
+---
+

@@ -4,10 +4,12 @@ using System.Threading;
 using DevHabit.Api.Database;
 using DevHabit.Api.DTOs.Users;
 using DevHabit.Api.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace DevHabit.Api.Controllers;
+[Authorize]
 [ApiController]
 [Route("users")]
 internal sealed class UserController(ApplicationDbContext dbContext) : Controller

@@ -1,1 +1,2 @@
 ﻿Add-Migration Add_RefreshTokens -Context ApplicationIdentityDbContext -o Migrations/Identity
+Add-Migration Add_UserId_Reference -Context ApplicationDbContext -o Migrations/Application

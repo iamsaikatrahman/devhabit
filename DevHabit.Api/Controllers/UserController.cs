@@ -14,7 +14,7 @@ namespace DevHabit.Api.Controllers;
 [Authorize]
 [ApiController]
 [Route("users")]
-internal sealed class UserController(ApplicationDbContext dbContext, UserContext userContext) : Controller
+public class UserController(ApplicationDbContext dbContext, UserContext userContext) : Controller
 {
     [HttpGet("{id}")]
     public async Task<ActionResult<UserDto>> GetUserById(string id, CancellationToken cancellationToken)

@@ -22,13 +22,21 @@ namespace DevHabit.Api.Controllers;
     CustomMediaTypeNames.Application.HateoasJson,
     CustomMediaTypeNames.Application.HateoasJson1,
     CustomMediaTypeNames.Application.HateoasJson2)]
-public class TagsController(ApplicationDbContext dbContext) : ControllerBase
+public class TagsController(
+    ApplicationDbContext dbContext, 
+    UserContext userContext) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<TagsCollectionDto>> GetTags([FromHeader] AcceptHeaderDto acceptHeader) 
     {
+        string? userId = await userContext.GetUserIdAsync();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Unauthorized();
+        }
         List<TagDto> tags = await dbContext
             .Tags
+            .Where(t => t.UserId == userId)
             .Select(TagQueries.ProjectToDto())
             .ToListAsync();
 
@@ -48,9 +56,14 @@ public class TagsController(ApplicationDbContext dbContext) : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<TagDto>> GetTag(string id, [FromHeader] AcceptHeaderDto acceptHeader) 
     {
+        string? userId = await userContext.GetUserIdAsync();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Unauthorized();
+        }
         TagDto? tag = await dbContext
             .Tags
-            .Where(t => t.Id == id)
+            .Where(t => t.Id == id && t.UserId == userId)
             .Select(TagQueries.ProjectToDto())
             .FirstOrDefaultAsync();
 
@@ -82,8 +95,12 @@ public class TagsController(ApplicationDbContext dbContext) : ControllerBase
             problem.Extensions.Add("errors", validationResult.ToDictionary());
             return BadRequest(problem);
         }
-
-        Tag tag = createTagDto.ToEntity();
+        string? userId = await userContext.GetUserIdAsync();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Unauthorized();
+        }
+        Tag tag = createTagDto.ToEntity(userId);
         if (await dbContext.Tags.AnyAsync(t => t.Name == tag.Name))
         {
             //return Conflict($"The tag '{tag.Name}' already exists");
@@ -106,7 +123,12 @@ public class TagsController(ApplicationDbContext dbContext) : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateTag(string id, UpdateTagDto updateTagDto) 
     {
-        Tag? tag = await dbContext.Tags.FirstOrDefaultAsync(t => t.Id == id);
+        string? userId = await userContext.GetUserIdAsync();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Unauthorized();
+        }
+        Tag? tag = await dbContext.Tags.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
         if (tag is null)
         {
             return NotFound();
@@ -120,7 +142,12 @@ public class TagsController(ApplicationDbContext dbContext) : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteTag(string id)
     {
-        Tag? tag = await dbContext.Tags.FirstOrDefaultAsync(t => t.Id == id);
+        string? userId = await userContext.GetUserIdAsync();
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return Unauthorized();
+        }
+        Tag? tag = await dbContext.Tags.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
         if (tag is null)
         {
             return NotFound();

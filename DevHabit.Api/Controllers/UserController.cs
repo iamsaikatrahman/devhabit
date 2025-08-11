@@ -11,12 +11,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace DevHabit.Api.Controllers;
-[Authorize]
+//[Authorize(Roles = $"{Roles.Admin},{Roles.Member}")]  
+[Authorize(Roles = Roles.Member)]  
 [ApiController]
 [Route("users")]
 public class UserController(ApplicationDbContext dbContext, UserContext userContext) : Controller
 {
     [HttpGet("{id}")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<ActionResult<UserDto>> GetUserById(string id, CancellationToken cancellationToken)
     {
         string? userId = await userContext.GetUserIdAsync();

@@ -24,4 +24,9 @@ public sealed class LinkService(LinkGenerator linkGenerator, IHttpContextAccesso
             Method = method
         };
     }
+
+    internal object Create(string v1, string v2, HttpMethod get)
+    {
+        throw new NotImplementedException();
+    }
 }

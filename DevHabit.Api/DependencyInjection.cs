@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using DevHabit.Api.Settings;
 using System.Text;
+using System.Net.Http.Headers;
 
 namespace DevHabit.Api;
   
@@ -146,7 +147,19 @@ public static class DependencyInjection
         builder.Services.AddTransient<LinkService>();
         builder.Services.AddTransient<TokenProvider>();
         builder.Services.AddMemoryCache();
-        builder.Services.AddScoped<UserContext>(); 
+        builder.Services.AddScoped<UserContext>();
+        builder.Services.AddScoped<GitHubAccessTokenService>();
+        builder.Services.AddTransient<GitHubService>();
+        builder.Services
+            .AddHttpClient("github")
+            .ConfigureHttpClient(client =>
+            {
+                client.BaseAddress = new Uri("https://api.github.com");
+                client.DefaultRequestHeaders
+                .UserAgent.Add(new ProductInfoHeaderValue("DevHabit", "1.0"));
+                client.DefaultRequestHeaders
+                .Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
+            });
         return builder;
     }
 
